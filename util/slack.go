@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 )
 
 type SlackMessage struct {
@@ -29,4 +30,9 @@ func PostText(webhook string, text string) (err error) {
 	}
 
 	return
+}
+
+func LogErr(err error) {
+	os.Stderr.WriteString(err.Error() + "\n")
+	os.Exit(1)
 }
