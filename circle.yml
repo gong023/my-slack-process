@@ -1,7 +1,7 @@
 test:
-  overwrite:
-    - go build -o stdpost_build github.com/gong023/my-slack-process/stdpost
-    - go build -o forecast_build github.com/gong023/my-slack-process/forecast
+  override:
+    - echo 'skip'
+
 deployment:
   production:
     branch: master
