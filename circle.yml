@@ -1,5 +1,9 @@
+test:
+  overwrite:
+    - go build -o stdpost_build github.com/gong023/my-slack-process/stdpost
+    - go build -o forecast_build github.com/gong023/my-slack-process/forecast
 deployment:
   production:
     branch: master
     commands:
-      - ssh cron 'bash ' < ./install.sh
+      - ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./install.sh
