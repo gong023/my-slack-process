@@ -64,8 +64,8 @@ func main() {
 		readQuery.Add("a", "user/-/state/com.google/read")
 		for _, item := range streamRes.Items {
 			attachment := util.Attachment{
-				Pretext: item.Title,
-				Text:    item.Origin.Title + "\n<" + item.Canonical[0].Href + ">",
+				Pretext: item.Canonical[0].Href,
+				Text:    item.Title + "\n" + item.Origin.Title,
 			}
 			attachments = append(attachments, attachment)
 			readQuery.Add("i", item.ID)
