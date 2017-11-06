@@ -12,7 +12,7 @@ import (
 func main() {
 	bytes, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal(err)
 	}
 	if len(bytes) == 0 {
 		os.Exit(0)
