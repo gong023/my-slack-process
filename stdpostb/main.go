@@ -10,19 +10,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
-)
 
-type (
-	SlackAttachments struct {
-		Attachments []Attachment `json:"attachments"`
-	}
-
-	Attachment struct {
-		Pretext   string `json:"pretext"`
-		Text      string `json:"text"`
-		Title     string `json:"title"`
-		TitleLink string `json:"title_link"`
-	}
+	"github.com/gong023/my-slack-process/slack"
 )
 
 func main() {
@@ -42,20 +31,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	attachments := []Attachment{}
+	attachments := []slack.Attachment{}
 	for _, msg := range strings.Split(string(b), "\n") {
-		attachment := Attachment{
-			Pretext: msg,
+		if msg == "" {
+			continue
+		}
+		attachment := slack.Attachment{}
+		err := json.Unmarshal([]byte(msg), &attachment)
+		if err != nil {
+			log.Fatal(err)
 		}
 		attachments = append(attachments, attachment)
 	}
 
-	if err := post(*webhook, SlackAttachments{Attachments: attachments}); err != nil {
+	if err := post(*webhook, slack.Attachments{Attachments: attachments}); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func post(webhook string, attachment SlackAttachments) (err error) {
+func post(webhook string, attachment slack.Attachments) (err error) {
 	sm, err := json.Marshal(attachment)
 
 	if err != nil {

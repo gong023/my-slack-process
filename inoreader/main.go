@@ -8,7 +8,10 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
+
+	"github.com/gong023/my-slack-process/slack"
 )
 
 type (
@@ -25,6 +28,7 @@ type (
 		Canonical []Canonical
 		Summary   Summary
 		Origin    Origin
+		Enclosure []Enclosure
 	}
 
 	Canonical struct {
@@ -36,7 +40,12 @@ type (
 	}
 
 	Origin struct {
-		Title string
+		Title   string
+		HtmlURL string `json:"htmlUrl"`
+	}
+
+	Enclosure struct {
+		Href string
 	}
 )
 
@@ -60,7 +69,7 @@ func main() {
 		readQuery := url.Values{}
 		readQuery.Add("a", "user/-/state/com.google/read")
 		for _, item := range streamRes.Items {
-			fmt.Println(item.Canonical[0].Href)
+			outPutItem(item)
 			readQuery.Add("i", item.ID)
 		}
 		if len(streamRes.Items) <= 0 {
@@ -124,6 +133,36 @@ func getStream(token, tag string) StreamRes {
 	}
 
 	return streamRes
+}
+
+func outPutItem(item Item) {
+	re := regexp.MustCompile("<.+>")
+	summary := re.ReplaceAllString(item.Summary.Content, "")
+	summary = strings.TrimSpace(summary)
+	summary = strings.Join(strings.Fields(summary), " ")
+	if rune := []rune(summary); len(rune) > 200 {
+		summary = string(rune)[:200]
+	}
+
+	attachment := slack.Attachment{
+		Fallback:   item.Canonical[0].Href,
+		AuthorName: item.Origin.Title,
+		AuthorIcon: item.Origin.HtmlURL + "favicon.ico",
+		Text:       summary,
+		Title:      item.Title,
+		TitleLink:  item.Canonical[0].Href,
+	}
+
+	if len(item.Enclosure) >= 1 {
+		attachment.ImageURL = item.Enclosure[0].Href
+	}
+
+	b, err := json.Marshal(attachment)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(b))
 }
 
 func markRead(token string, q url.Values) {
