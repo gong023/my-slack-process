@@ -1,12 +1,20 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"flag"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
+)
 
-	"github.com/gong023/my-slack-process/util"
+type (
+	SlackMessage struct {
+		Text string `json:"text"`
+	}
 )
 
 func main() {
@@ -24,5 +32,25 @@ func main() {
 		log.Fatal("webhook is required")
 	}
 
-	util.PostText(*webhook, string(bytes))
+	postText(*webhook, string(bytes))
+}
+
+func postText(webhook string, text string) (err error) {
+	sm, err := json.Marshal(SlackMessage{Text: text})
+
+	if err != nil {
+		return
+	}
+
+	res, err := http.Post(webhook, "application/json", bytes.NewBuffer(sm))
+
+	if err != nil {
+		return
+	}
+
+	if res.StatusCode >= 300 {
+		return errors.New("fail to post slack:" + res.Status)
+	}
+
+	return
 }
