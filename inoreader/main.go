@@ -156,7 +156,7 @@ func outPutItem(item Item) {
 		attachment.ImageURL = item.Enclosure[0].Href
 	}
 
-	if u, err := url.Parse(item.Origin.HtmlURL); err == nil {
+	if u, err := url.Parse(item.Canonical[0].Href); err == nil {
 		attachment.AuthorIcon = u.Scheme + "://" + u.Host + "/favicon.ico"
 	}
 
