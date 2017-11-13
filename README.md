@@ -8,6 +8,6 @@ WEATHER_WEBHOOK=XXXXX
 
 00   16  * * * forecast -wtoken $WTOKEN 2>&1 | stdpost -webhook $WEATHER_WEBHOOK
 00   0   * * * forecast -wtoken $WTOKEN 2>&1 | stdpost -webhook $WEATHER_WEBHOOK
-*/20 *   * * * stdpostd -wtoken $WTOKEN -messages <(inoreader -refresh_path XXX -client_id XXX -client_sec XXX -tags XXX)
-00   */2 * * * stdpostd -wtoken $WTOKEN -messages <(coinbase -key XXX -sec XXX)
+*/20 *   * * * stdpostb -wtoken $WTOKEN -messages <(inoreader -refresh_path XXX -client_id XXX -client_sec XXX -tags XXX)
+00   */2 * * * stdpostb -wtoken $WTOKEN -messages <(coinbase -key XXX -sec XXX)
 ```
