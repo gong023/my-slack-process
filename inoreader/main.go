@@ -140,14 +140,13 @@ func outPutItem(item Item) {
 	summary := re.ReplaceAllString(item.Summary.Content, "")
 	summary = strings.TrimSpace(summary)
 	summary = strings.Join(strings.Fields(summary), " ")
-	if rune := []rune(summary); len(rune) > 200 {
-		summary = string(rune)[:200]
+	if r := []rune(summary); len(r) > 400 {
+		summary = string(r[:400])
 	}
 
 	attachment := slack.Attachment{
 		Fallback:   item.Canonical[0].Href,
 		AuthorName: item.Origin.Title,
-		AuthorIcon: item.Origin.HtmlURL + "favicon.ico",
 		Text:       summary,
 		Title:      item.Title,
 		TitleLink:  item.Canonical[0].Href,
@@ -155,6 +154,10 @@ func outPutItem(item Item) {
 
 	if len(item.Enclosure) >= 1 {
 		attachment.ImageURL = item.Enclosure[0].Href
+	}
+
+	if u, err := url.Parse(item.Origin.HtmlURL); err == nil {
+		attachment.AuthorIcon = u.Scheme + "://" + u.Host + "/favicon.ico"
 	}
 
 	b, err := json.Marshal(attachment)
