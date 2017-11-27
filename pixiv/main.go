@@ -2,20 +2,17 @@ package main
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
-	"sync"
 	"time"
+
+	"github.com/gong023/my-slack-process/slack"
 )
 
 type (
@@ -67,10 +64,10 @@ func main() {
 	device_token := flag.String("device_token", "", "device_token")
 	client_sec := flag.String("client_sec", "", "client secret")
 	refresh_token := flag.String("refresh_token", "", "refresh token")
-	save := flag.String("save", "/tmp", "path to save")
+	host := flag.String("host", "", "redirect host")
 	s := flag.Int64("since", 20, "following illust since X min")
 	flag.Parse()
-	if *client_id == "" || *device_token == "" || *client_sec == "" || *refresh_token == "" {
+	if *client_id == "" || *device_token == "" || *client_sec == "" || *refresh_token == "" || *host == "" {
 		log.Fatal("missing parameter")
 	}
 
@@ -84,7 +81,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var wg sync.WaitGroup
 	since := time.Now().Add(-1 * time.Duration(*s) * time.Minute)
 	for _, illust := range illusts.Illusts {
 		create, err := time.Parse(time.RFC3339, illust.CreateDate)
@@ -95,33 +91,32 @@ func main() {
 			continue
 		}
 
-		h := md5.New()
-		io.WriteString(h, illust.Caption)
-		path := *save + "/" + fmt.Sprintf("%x", h.Sum(nil)) + "/"
-		os.MkdirAll(path, os.ModePerm)
-		ioutil.WriteFile(path+"/title.txt", []byte(illust.Title), os.ModePerm)
-		ioutil.WriteFile(path+"/caption.txt", []byte(illust.Caption), os.ModePerm)
-
+		attachments := slack.Attachments{
+			Attachments: []slack.Attachment{
+				{
+					Title:   illust.Title,
+					Pretext: illust.Caption,
+				},
+			},
+		}
 		if len(illust.MetaPages) <= 0 {
-			wg.Add(1)
-			go func(save, imageURL string) {
-				defer wg.Done()
-				b, _ := getImage(imageURL)
-				ioutil.WriteFile(save, b, os.ModePerm)
-			}(path+"0.jpeg", illust.ImageURLs.Medium)
-			continue
+			attachments.Attachments = append(attachments.Attachments, slack.Attachment{
+				ImageURL: *host + "?" + imagePath(illust.ImageURLs.Medium),
+			})
+		} else {
+			for _, metaPage := range illust.MetaPages {
+				attachments.Attachments = append(attachments.Attachments, slack.Attachment{
+					ImageURL: *host + "?" + imagePath(metaPage.Medium),
+				})
+			}
 		}
 
-		for i, metaPage := range illust.MetaPages {
-			wg.Add(1)
-			go func(save, imageURL string) {
-				defer wg.Done()
-				b, _ := getImage(imageURL)
-				ioutil.WriteFile(save, b, os.ModePerm)
-			}(path+strconv.Itoa(i)+".jpeg", metaPage.Medium)
+		b, err := json.Marshal(attachments)
+		if err != nil {
+			log.Fatal(err)
 		}
+		fmt.Println(string(b))
 	}
-	wg.Wait()
 }
 
 func getToken(client_id, client_sec, device_token, refresh_token string) (token TokenData, err error) {
@@ -196,25 +191,11 @@ func getFollowingIllusts(token TokenData) (illusts FollowingIllusts, err error) 
 	return
 }
 
-func getImage(url string) (b []byte, err error) {
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return
-	}
-
-	req.Header.Add("Referer", "https://app-api.pixiv.net/")
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return
-	}
-	defer res.Body.Close()
-
-	b, err = ioutil.ReadAll(res.Body)
-	if err != nil {
-		return
-	}
-	return
+func imagePath(origin string) string {
+	originURL, _ := url.Parse(origin)
+	u := url.Values{}
+	u.Add("q", originURL.RequestURI())
+	return u.Encode()
 }
 
 func commonHeader(h http.Header) {
