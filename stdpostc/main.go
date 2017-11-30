@@ -38,7 +38,13 @@ func main() {
 		attachments := slack.Attachments{}
 		err := json.Unmarshal([]byte(msg), &attachments)
 		if err != nil {
-			log.Fatal(err)
+			attachments = slack.Attachments{
+				Attachments: []slack.Attachment{
+					{
+						Text: msg,
+					},
+				},
+			}
 		}
 		if err := post(*webhook, attachments); err != nil {
 			log.Fatal(err)

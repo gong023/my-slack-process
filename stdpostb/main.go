@@ -39,7 +39,7 @@ func main() {
 		attachment := slack.Attachment{}
 		err := json.Unmarshal([]byte(msg), &attachment)
 		if err != nil {
-			log.Fatal(err)
+			attachment.Text = msg
 		}
 		attachments = append(attachments, attachment)
 	}
