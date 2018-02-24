@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os/exec"
 	"strconv"
 	"time"
 )
@@ -32,9 +33,10 @@ type (
 	}
 
 	Program struct {
-		Name    string  `json:"name"`
-		ID      int     `json:"id"`
-		Episode Episode `json:"episode"`
+		Name              string  `json:"name"`
+		ID                int     `json:"id"`
+		LatestEpisodeName string  `json:"latest_episode_name"`
+		Episode           Episode `json:"episode"`
 	}
 
 	Episode struct {
@@ -57,9 +59,10 @@ type (
 func main() {
 	email := flag.String("email", "", "login email")
 	password := flag.String("pass", "", "login password")
+	savePath := flag.String("save", "", "audio file path")
 	s := flag.Duration("since", time.Hour, "get since")
 	flag.Parse()
-	if *email == "" || *password == "" {
+	if *email == "" || *password == "" || *savePath == "" {
 		log.Fatal("missing parameter")
 	}
 	since := time.Now().Add(*(s) * -1)
@@ -90,8 +93,12 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(playCheck.Token)
-		log.Println(playCheck.PlaylistURL)
+		fileName := fmt.Sprintf("[%s]%s.aac", fav.Program.LatestEpisodeName, fav.Program.Name)
+		err = download(playCheck.PlaylistURL, *savePath+"/"+fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+		break
 	}
 }
 
@@ -172,6 +179,11 @@ func getPlayCheck(auth Auth, video Video) (playCheck PlayCheck, err error) {
 	}
 	err = json.Unmarshal(b, &playCheck)
 	return
+}
+
+func download(m3u8URL, saveFile string) (err error) {
+	args := []string{"-y", "-vn", "-i", m3u8URL, "-acodec", "copy", "-bsf:a", "aac_adtstoasc", saveFile}
+	return exec.Command("ffmpeg", args...).Run()
 }
 
 func commonHeader(h http.Header, auth Auth) {
