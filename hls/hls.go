@@ -1,8 +1,7 @@
-package main
+package hls
 
 import (
 	"errors"
-	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -20,41 +19,33 @@ type Playlist struct {
 	totalDuration time.Duration
 }
 
-var client = &http.Client{}
-var verbose bool
-
-func main() {
-	// https://d22puzix29w08m.cloudfront.net/video/2810bb676e325412913e2d431479e8e4/7d35e7e2f52a9613/ts_audio.m3u8
-	m3u8_str := flag.String("url", "", "m3u8 url")
-	save_path := flag.String("save_path", "", "")
-	//v := flag.Bool("v", false, "verbose")
-	//user_agent := flag.String("user_agent", "AppleCoreMedia/1.0.0.15B93 (iPad; U; CPU OS 11_1 like Mac OS X; ja_jp", "")
-	flag.Parse()
-	if *m3u8_str == "" || *save_path == "" {
-		log.Fatal("missing parameter")
-	}
-	verbose = true
-	m3u8_url, err := url.Parse(*m3u8_str)
+// todo
+func Download(client *http.Client, req *http.Request, savePath string) (err error) {
+	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return
+	}
+	playlist, _, err := m3u8.DecodeFrom(res.Body, true)
+	mpl, ok := playlist.(*m3u8.MasterPlaylist)
+	if !ok {
+		return errors.New("invalid playlist type")
+	}
+	r, err := http.NewRequest("GET", mpl.Variants[0].URI, nil)
+	if err != nil {
+		return
 	}
 
 	psChan := make(chan *Playlist, 1024)
-	go getPlaylist(m3u8_url, psChan)
-	if err := downloadSegment(*save_path, psChan); err != nil {
-		log.Fatal(err)
-	}
+	go getPlaylist(client, r, psChan)
+	err = downloadSegment(client, savePath, psChan)
+	return
 }
 
-func getPlaylist(m3u8_url *url.URL, psChan chan *Playlist) error {
+func getPlaylist(client *http.Client, req *http.Request, psChan chan *Playlist) error {
 	cache := lru.New(1024)
 	recDuration := time.Duration(0)
 
 	for {
-		req, err := http.NewRequest("GET", m3u8_url.String(), nil)
-		if err != nil {
-			return err
-		}
 		resp, err := client.Do(req)
 		if err != nil {
 			return err
@@ -80,7 +71,7 @@ func getPlaylist(m3u8_url *url.URL, psChan chan *Playlist) error {
 					return err
 				}
 			} else {
-				msURL, err := m3u8_url.Parse(v.URI)
+				msURL, err := req.URL.Parse(v.URI)
 				if err != nil {
 					return err
 				}
@@ -105,8 +96,8 @@ func getPlaylist(m3u8_url *url.URL, psChan chan *Playlist) error {
 	}
 }
 
-func downloadSegment(save_path string, psChan chan *Playlist) error {
-	out, err := os.Create(save_path)
+func downloadSegment(client *http.Client, savePath string, psChan chan *Playlist) error {
+	out, err := os.Create(savePath)
 	if err != nil {
 		return err
 	}
@@ -125,9 +116,7 @@ func downloadSegment(save_path string, psChan chan *Playlist) error {
 			return err
 		}
 		resp.Body.Close()
-		if verbose {
-			log.Printf("Downloaded %v\n", v.URI)
-		}
+		log.Printf("Downloaded %v\n", v.URI)
 	}
 	return nil
 }
