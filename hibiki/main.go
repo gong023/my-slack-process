@@ -13,6 +13,8 @@ import (
 	"os/exec"
 	"strconv"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -79,27 +81,40 @@ func main() {
 
 	jloc, _ := time.LoadLocation("Asia/Tokyo")
 
+	results := make([]string, len(favs))
+	var g errgroup.Group
 	for _, fav := range favs {
-		episode := fav.Program.Episode
-		updated, err := time.ParseInLocation("2006/01/02 15:04:05", episode.UpdatedAt, jloc)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if updated.Before(since) {
-			continue
-		}
+		g.Go(func() (err error) {
+			episode := fav.Program.Episode
+			updated, err := time.ParseInLocation("2006/01/02 15:04:05", episode.UpdatedAt, jloc)
+			if err != nil {
+				return
+			}
+			if updated.Before(since) {
+				return
+			}
 
-		playCheck, err := getPlayCheck(auth, episode.Video)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fileName := fmt.Sprintf("[%s]%s.aac", fav.Program.LatestEpisodeName, fav.Program.Name)
-		err = download(playCheck.PlaylistURL, *savePath+"/"+fileName)
-		if err != nil {
-			log.Fatal(err)
-		}
-		break
+			playCheck, err := getPlayCheck(auth, episode.Video)
+			if err != nil {
+				return
+			}
+			filePath := fmt.Sprintf("%s/[%s]%s.aac", *savePath, fav.Program.LatestEpisodeName, fav.Program.Name)
+			err = ffmpeg(playCheck.PlaylistURL, filePath)
+			if err != nil {
+				return
+			}
+			results = append(results, filePath)
+			return
+		})
 	}
+
+	if err := g.Wait(); err != nil {
+		log.Fatal(err)
+	}
+	for _, result := range results {
+		fmt.Println(result)
+	}
+
 }
 
 func login(email, password string) (auth Auth, err error) {
@@ -181,7 +196,7 @@ func getPlayCheck(auth Auth, video Video) (playCheck PlayCheck, err error) {
 	return
 }
 
-func download(m3u8URL, saveFile string) (err error) {
+func ffmpeg(m3u8URL, saveFile string) (err error) {
 	args := []string{"-y", "-vn", "-i", m3u8URL, "-acodec", "copy", "-bsf:a", "aac_adtstoasc", saveFile}
 	return exec.Command("ffmpeg", args...).Run()
 }
