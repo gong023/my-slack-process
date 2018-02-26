@@ -12,9 +12,8 @@ import (
 	"net/url"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
-
-	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -82,9 +81,13 @@ func main() {
 	jloc, _ := time.LoadLocation("Asia/Tokyo")
 
 	results := make([]string, len(favs))
-	var g errgroup.Group
+
+	var wg sync.WaitGroup
 	for _, fav := range favs {
-		g.Go(func() (err error) {
+		wg.Add(1)
+		go func(fav FavRes) {
+			defer wg.Done()
+
 			episode := fav.Program.Episode
 			updated, err := time.ParseInLocation("2006/01/02 15:04:05", episode.UpdatedAt, jloc)
 			if err != nil {
@@ -104,17 +107,16 @@ func main() {
 				return
 			}
 			results = append(results, filePath)
-			return
-		})
+		}(fav)
 	}
+	wg.Wait()
 
-	if err := g.Wait(); err != nil {
+	if err != nil {
 		log.Fatal(err)
 	}
 	for _, result := range results {
 		fmt.Println(result)
 	}
-
 }
 
 func login(email, password string) (auth Auth, err error) {
