@@ -6,9 +6,7 @@ jobs:
       enabled: true
     steps:
       - checkout
-      - run:
-        command: |
-          ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./install.sh
+      - run: ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./install.sh
 
 workflows:
   version: 2
