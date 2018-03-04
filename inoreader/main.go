@@ -11,13 +11,11 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/gong023/my-slack-process/oauth"
 	"github.com/gong023/my-slack-process/slack"
 )
 
 type (
-	TokenRes struct {
-		AccessToken string `json:"access_token"`
-	}
 	StreamRes struct {
 		Items []Item
 	}
@@ -63,7 +61,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tres := getToken(*clientID, *clientSec, string(refreshToken))
+	req := oauth.NewRefresh("https://www.inoreader.com/oauth2/token")
+	tres, err := req.Refresh(*clientID, *clientSec, string(refreshToken))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, tag := range strings.Split(*tags, ",") {
 		streamRes := getStream(tres.AccessToken, tag)
 		readQuery := url.Values{}
@@ -77,33 +80,6 @@ func main() {
 		}
 		markRead(tres.AccessToken, readQuery)
 	}
-}
-
-func getToken(clientID, clientSec, refreshToken string) TokenRes {
-	vals := url.Values{}
-	vals.Set("client_id", clientID)
-	vals.Set("client_secret", clientSec)
-	vals.Set("grant_type", "refresh_token")
-	vals.Set("refresh_token", refreshToken)
-	resp, err := http.PostForm("https://www.inoreader.com/oauth2/token", vals)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 300 {
-		log.Fatal("refresh token error. go https://glassof.garden/oauth")
-	}
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var tres TokenRes
-	err = json.Unmarshal(b, &tres)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return tres
 }
 
 func getStream(token, tag string) StreamRes {
