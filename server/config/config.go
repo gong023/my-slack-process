@@ -5,6 +5,7 @@ import "os"
 type Config struct {
 	Prod              string
 	Host              string
+	Port              string
 	Cert              string
 	Pass              string
 	GoogleClientID    string
@@ -19,13 +20,16 @@ type Config struct {
 
 func New() Config {
 	host := os.Getenv("HOST")
+	port := ":443"
 	if os.Getenv("PROD") != "1" {
 		host = "http://localhost:1443"
+		port = ":1443"
 	}
 
 	return Config{
 		Prod:              os.Getenv("PROD"),
 		Host:              host,
+		Port:              port,
 		Cert:              os.Getenv("CERT"),
 		Pass:              os.Getenv("PASS"),
 		GoogleClientID:    os.Getenv("GOOGLE_CLIENT_ID"),

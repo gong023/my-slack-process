@@ -1,6 +1,12 @@
 version: 2
 
 jobs:
+  sever:
+    machine:
+      enabled: true
+    steps:
+      - checkout
+      - run: ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./server.sh
   install:
     machine:
       enabled: true
@@ -12,6 +18,10 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
+      - server:
+          filters:
+            branches:
+              only: master
       - install:
           filters:
             branches:

@@ -53,7 +53,7 @@ func main() {
 	http.HandleFunc("/pi", pixiv.ImageProxy)
 
 	srv := &http.Server{
-		Addr:         "1443",
+		Addr:         c.Port,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		IdleTimeout:  120 * time.Second,
