@@ -47,11 +47,7 @@ func (r *RefreshReq) Refresh(clientID, clientSec, refreshToken string) (res Toke
 	if err != nil {
 		return
 	}
-	var tres TokenRes
-	err = json.Unmarshal(b, &tres)
-	if err != nil {
-		return
-	}
+	err = json.Unmarshal(b, &res)
 	return
 }
 
