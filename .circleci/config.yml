@@ -13,6 +13,19 @@ jobs:
     steps:
       - checkout
       - run: ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./install.sh
+  gcr:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+          name: build and push
+          command: |
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p:${CIRCLE_BUILD_NUM} .
 
 workflows:
   version: 2
@@ -23,6 +36,10 @@ workflows:
             branches:
               only: master
       - install:
+          filters:
+            branches:
+              only: master
+      - gcr:
           filters:
             branches:
               only: master
