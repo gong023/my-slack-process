@@ -7,12 +7,6 @@ jobs:
     steps:
       - checkout
       - run: ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./server.sh
-  install:
-    machine:
-      enabled: true
-    steps:
-      - checkout
-      - run: ssh -i ~/.ssh/id_cron gong023@150.95.181.231 'bash ' < ./install.sh
   gcr:
     docker:
       - image: google/cloud-sdk
@@ -32,10 +26,6 @@ workflows:
   build-and-deploy:
     jobs:
       - server:
-          filters:
-            branches:
-              only: master
-      - install:
           filters:
             branches:
               only: master
