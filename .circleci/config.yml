@@ -13,13 +13,35 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build and push
+          name: auth
           command: |
             echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
             gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
             gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
             gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+      - run:
+          name: build and push
+          command: |
             gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p:${CIRCLE_BUILD_NUM} .
+  helm:
+    docker:
+      - image: devth/helm
+    steps:
+      - checkout
+      - run:
+          name: auth
+          command: |
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+      - run:
+          name: helm
+          command: |
+            helm upgrade \
+              --install \
+              --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_BUILD_NUM} \
+              cron ./manifests/
 
 workflows:
   version: 2
@@ -30,6 +52,12 @@ workflows:
             branches:
               only: master
       - gcr:
+          filters:
+            branches:
+              only: master
+      - helm:
+          requires:
+            - gcr
           filters:
             branches:
               only: master

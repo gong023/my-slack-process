@@ -1,2 +1,3 @@
 *_build
 server/dev.sh
+manifests/secret.yaml
