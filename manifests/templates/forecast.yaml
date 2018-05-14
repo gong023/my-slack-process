@@ -1,0 +1,29 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: forecast
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: test
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/sh"]
+            args: ["-c", "forecast -wtoken $(WTOKEN) 2>&1 | stdpost -webhook $(WEBHOOK)"]
+            env:
+              - name: WTOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: wtoken
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: weahter-webhook
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 3
