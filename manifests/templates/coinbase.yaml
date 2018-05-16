@@ -1,29 +1,34 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: forecast
+  name: coinbase
 spec:
-  schedule: "00 */8 * * *"
+  schedule: "00 */2 * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: forecast
+          - name: coinbase
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
             command: ["/bin/sh"]
-            args: ["-c", "forecast -wtoken $(WTOKEN) 2>&1 | stdpost -webhook $(WEBHOOK)"]
+            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(coinbase -key $(APIKEY) -sec $(APISEC) 2>&1)"]
             env:
-              - name: WTOKEN
+              - name: APIKEY
                 valueFrom:
                   secretKeyRef:
                     name: slacksec
-                    key: wtoken
+                    key: coinbase-key
+              - name: APISEC
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: coinbase-sec
               - name: WEBHOOK
                 valueFrom:
                   secretKeyRef:
                     name: slacksec
-                    key: weahter-webhook
+                    key: general-webhook
           restartPolicy: Never
           successfulJobsHistoryLimit: 0
           failedJobsHistoryLimit: 3
