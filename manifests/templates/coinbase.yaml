@@ -11,7 +11,7 @@ spec:
           containers:
           - name: coinbase
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
-            command: ["/bin/sh"]
+            command: ["/bin/bash"]
             args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(coinbase -key $(APIKEY) -sec $(APISEC) 2>&1)"]
             env:
               - name: APIKEY

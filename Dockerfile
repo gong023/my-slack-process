@@ -4,7 +4,7 @@ ADD . /go/src/github.com/gong023/my-slack-process
 
 RUN /go/src/github.com/gong023/my-slack-process/build.sh
 
-FROM jrottenberg/ffmpeg:3.4-alpine
+FROM jrottenberg/ffmpeg:3.4-centos
 
 COPY --from=builder /usr/local/bin/stdpost /usr/local/bin/stdpost
 COPY --from=builder /usr/local/bin/stdpostb /usr/local/bin/stdpostb
