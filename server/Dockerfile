@@ -1,0 +1,11 @@
+FROM golang:1.10 as builder
+
+ADD . /go/src/github.com/gong023/my-slack-process/server
+
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /usr/local/bin/server github.com/gong023/my-slack-process/server
+
+FROM alpine:3.7
+
+COPY --from=builder /usr/local/bin/server /usr/local/bin/server
+ENTRYPOINT ["server"]
+
