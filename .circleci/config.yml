@@ -18,6 +18,7 @@ jobs:
           name: build and push
           command: |
             gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p:${CIRCLE_BUILD_NUM} .
+            gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p-server:${CIRCLE_BUILD_NUM} ./server
       - run:
           name: helm
           command: |
