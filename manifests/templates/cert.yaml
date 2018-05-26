@@ -1,0 +1,19 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: cert
+  namespace: default
+spec:
+  secretName: cert-manager-tls
+  issuerRef:
+    name: cert-issuer-prod
+  commonName: {{ .Values.Host }}
+  dnsNames:
+  - www.{{ .Values.Host }}
+  acme:
+    config:
+    - dns01:
+        provider: cert-dns
+      domains:
+      - {{ .Values.Host }}
+      - www.{{ .Values.Host }}

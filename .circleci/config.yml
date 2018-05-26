@@ -24,7 +24,7 @@ jobs:
           command: |
             helm upgrade \
               --install \
-              --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_BUILD_NUM} \
+              --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_BUILD_NUM},Host=${HOST} \
               cron ./manifests/
 
 workflows:

@@ -5,6 +5,10 @@ metadata:
   annotations:
     kubernetes.io/ingress.global-static-ip-name: server-static-ip
 spec:
+  tls:
+  - secretName: cert-manager-tls
+    hosts:
+      - {{ .Values.Host }}
   backend:
     serviceName: server-deployment
     servicePort: 8080

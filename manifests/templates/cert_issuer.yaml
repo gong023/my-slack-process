@@ -1,0 +1,19 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: cert-issuer-prod
+spec:
+  acme:
+    server: https://acme-v01.api.letsencrypt.org/directory
+    email: gon.gong.gone@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    http01: {}
+    dns01:
+      providers:
+      - name: cert-dns
+        clouddns:
+          serviceAccountSecretRef:
+            name: clouddns-service-account
+            key: cert-manager-key.json
+          project: {{ .Values.ProjectId }}
