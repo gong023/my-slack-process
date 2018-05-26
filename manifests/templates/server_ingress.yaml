@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: server-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: server-static-ip
+spec:
+  backend:
+    serviceName: server-deployment
+    servicePort: 8080
