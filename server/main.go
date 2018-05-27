@@ -12,6 +12,9 @@ func main() {
 
 	mux.HandleFunc("/", handler.Index)
 	mux.HandleFunc("/pi", handler.ImageProxy)
+	mux.HandleFunc("/oauth", handler.OauthIndex)
+	mux.HandleFunc("/oauth/inoreader/start", handler.InoStart)
+	mux.HandleFunc("/oauth/inoreader/callback", handler.InoCallback)
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)

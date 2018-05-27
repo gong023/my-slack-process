@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 type (
@@ -20,10 +18,6 @@ type (
 		AccessToken  string `json:"access_token"`
 		RefreshToken string `json:"refresh_token"`
 	}
-)
-
-const (
-	msgTpl = `<html> <body> {{.Msg}} </body> </html>`
 )
 
 func (r *RefreshReq) Refresh(clientID, clientSec, refreshToken string) (res TokenRes, err error) {
@@ -53,53 +47,4 @@ func (r *RefreshReq) Refresh(clientID, clientSec, refreshToken string) (res Toke
 
 func NewRefresh(url string) RefreshReq {
 	return RefreshReq{URL: url}
-}
-
-func StartHandler(reqURL, pass string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		if r.PostForm.Get("pass") == pass {
-			http.Redirect(w, r, reqURL, http.StatusFound)
-		}
-
-		t, err := template.New("start").Parse(msgTpl)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-		data := struct {
-			Msg string
-		}{
-			Msg: r.PostForm.Get("pass"),
-		}
-		err = t.Execute(w, data)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-	}
-}
-
-func CallbackHandler(vals url.Values, tokenURL, accessPath, refreshPath string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vals.Add("code", r.URL.Query().Get("code"))
-		res, err := http.PostForm(tokenURL, vals)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-			return
-		}
-		defer res.Body.Close()
-
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-			return
-		}
-		var tres TokenRes
-		err = json.Unmarshal(b, &tres)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-			return
-		}
-		ioutil.WriteFile(accessPath, []byte(tres.AccessToken), os.ModePerm)
-		ioutil.WriteFile(refreshPath, []byte(tres.RefreshToken), os.ModePerm)
-	}
 }

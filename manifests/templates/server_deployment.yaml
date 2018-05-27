@@ -19,3 +19,29 @@ spec:
         image: gcr.io/{{ .Values.ProjectId }}/slack-p-server:{{ .Values.BuildNum }}
         ports:
         - containerPort: 8080
+        env:
+          - name: HOST
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: host
+          - name: PASS
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: pass
+          - name: DOC_ID
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: doc-id
+          - name: INO_CLI_ID
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: ino-cli-id
+          - name: INO_CLI_SEC
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: ino-cli-sec
