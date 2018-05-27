@@ -17,8 +17,12 @@ jobs:
       - run:
           name: build and push
           command: |
-            gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p:${CIRCLE_BUILD_NUM} .
-            gcloud container builds submit -t gcr.io/${GOOGLE_PROJECT_ID}/slack-p-server:${CIRCLE_BUILD_NUM} ./server
+            gcloud container builds submit \
+              --config=cloudbuild.worker.yaml \
+              --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_BUILD_NUM} .
+            gcloud container builds submit \
+              --config=cloudbuild.server.yaml \
+              --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_BUILD_NUM} .
       - run:
           name: helm
           command: |

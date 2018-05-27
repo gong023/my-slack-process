@@ -1,0 +1,4 @@
+steps:
+- name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', 'gcr.io/$_PROJECT_ID/slack-p:$_BUILD_NUM', '-f', 'Dockerfile.worker', '.']
+images: ['gcr.io/$_PROJECT_ID/slack-p:$_BUILD_NUM']

@@ -1,6 +1,6 @@
 FROM golang:1.10 as builder
 
-ADD . /go/src/github.com/gong023/my-slack-process/server
+ADD . /go/src/github.com/gong023/my-slack-process
 
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /usr/local/bin/server github.com/gong023/my-slack-process/server
 
