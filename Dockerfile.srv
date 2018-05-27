@@ -6,6 +6,8 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /usr/local/bin/server gith
 
 FROM alpine:3.7
 
+RUN apk add --update ca-certificates
+
 COPY --from=builder /usr/local/bin/server /usr/local/bin/server
 ENTRYPOINT ["server"]
 
