@@ -9,6 +9,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/gong023/my-slack-process/server/config"
+	"google.golang.org/api/option"
 )
 
 const (
@@ -98,7 +99,7 @@ func callback(w http.ResponseWriter, r *http.Request, vals url.Values, tokenURL,
 
 	ctx := r.Context()
 	c := config.New()
-	client, err := firestore.NewClient(ctx, c.ProjectID)
+	client, err := firestore.NewClient(ctx, c.ProjectID, option.WithScopes("https://www.googleapis.com/auth/firebase"))
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		return
