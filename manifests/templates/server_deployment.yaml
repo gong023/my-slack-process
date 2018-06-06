@@ -14,6 +14,7 @@ spec:
       labels:
         app: server
     spec:
+      serviceAccountName: fb-svc-account
       containers:
       - name: server
         image: gcr.io/{{ .Values.ProjectId }}/slack-p-server:{{ .Values.BuildNum }}
