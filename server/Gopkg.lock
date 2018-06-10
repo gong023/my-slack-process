@@ -7,10 +7,15 @@
     "compute/metadata",
     "firestore",
     "firestore/apiv1beta1",
+    "iam",
+    "internal",
     "internal/atomiccache",
     "internal/btree",
     "internal/fields",
-    "internal/version"
+    "internal/optional",
+    "internal/trace",
+    "internal/version",
+    "storage"
   ]
   revision = "0fd7230b2a7505833d5f69b75cbd6c9582401479"
   version = "v0.23.0"
@@ -109,10 +114,14 @@
   branch = "master"
   name = "google.golang.org/api"
   packages = [
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
     "googleapi/transport",
     "internal",
     "iterator",
     "option",
+    "storage/v1",
     "transport",
     "transport/grpc",
     "transport/http"
@@ -144,6 +153,8 @@
   packages = [
     "googleapis/api/annotations",
     "googleapis/firestore/v1beta1",
+    "googleapis/iam/v1",
+    "googleapis/rpc/code",
     "googleapis/rpc/status",
     "googleapis/type/latlng"
   ]
@@ -184,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "58872f418acdbe9736d72dc6b0acb10e265e8873758f7affeef9c355ab4046d8"
+  inputs-digest = "60fb79dd19a635d108d67f69ff8a4610ccc5f41452cc99198c35b225a4976173"
   solver-name = "gps-cdcl"
   solver-version = 1
