@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"cloud.google.com/go/firestore"
+	"cloud.google.com/go/storage"
 	"github.com/gong023/my-slack-process/server/config"
-	"google.golang.org/api/option"
 )
 
 const (
@@ -99,17 +98,19 @@ func callback(w http.ResponseWriter, r *http.Request, vals url.Values, tokenURL,
 
 	ctx := r.Context()
 	c := config.New()
-	client, err := firestore.NewClient(ctx, c.ProjectID, option.WithScopes("https://www.googleapis.com/auth/firebase"))
+	client, err := storage.NewClient(ctx)
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
 		return
 	}
-	defer client.Close()
-	fmt.Fprintf(w, string(b))
-	_, err = client.Collection("tokens").Doc(c.DocID).Set(ctx, map[string]interface{}{
-		field: string(b),
-	})
-	if err != nil {
+	bucket := client.Bucket("oauth")
+	if err := bucket.Create(ctx, c.ProjectID, nil); err != nil {
+		fmt.Fprintf(w, err.Error())
+		return
+	}
+	ow := bucket.Object(field).NewWriter(ctx)
+	defer ow.Close()
+	if _, err := ow.Write(b); err != nil {
 		fmt.Fprintf(w, err.Error())
 		return
 	}
