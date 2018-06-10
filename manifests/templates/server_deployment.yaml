@@ -14,7 +14,6 @@ spec:
       labels:
         app: server
     spec:
-      serviceAccountName: fb-svc-account
       containers:
       - name: server
         image: gcr.io/{{ .Values.ProjectId }}/slack-p-server:{{ .Values.BuildNum }}
@@ -26,6 +25,16 @@ spec:
               secretKeyRef:
                 name: slacksec
                 key: host
+          - name: PROJECT_ID
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: project-id
+          - name: OAUTH_BUCKET
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: oauth-bucket
           - name: PASS
             valueFrom:
               secretKeyRef:
