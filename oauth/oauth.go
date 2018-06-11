@@ -35,7 +35,7 @@ func (r *RefreshReq) Refresh(clientID, clientSec, refreshToken string) (res Toke
 	if resp.StatusCode >= 300 {
 		b, _ := ioutil.ReadAll(resp.Body)
 		fmt.Println(string(b))
-		return res, errors.New("refresh token error. go https://glassof.garden/oauth")
+		return res, errors.New("refresh token error. go https://cron.gonge.fun/oauth")
 	}
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

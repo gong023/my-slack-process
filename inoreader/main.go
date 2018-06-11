@@ -48,21 +48,23 @@ type (
 )
 
 func main() {
-	refreshPath := flag.String("refresh_path", "", "refresh token file path")
+	refreshRes := flag.String("refresh_res", "", "refresh token response")
 	clientID := flag.String("client_id", "", "inoreader client id")
 	clientSec := flag.String("client_sec", "", "inoreader client secret")
 	tags := flag.String("tags", "", "target innoreader tags. separate by comma(,)")
 	flag.Parse()
-	if *refreshPath == "" || *clientID == "" || *clientSec == "" || *tags == "" {
+	if *refreshRes == "" || *clientID == "" || *clientSec == "" || *tags == "" {
 		log.Fatal("missing parameter")
 	}
-	refreshToken, err := ioutil.ReadFile(*refreshPath)
+
+	var r oauth.TokenRes
+	err := json.Unmarshal([]byte(*refreshRes), r)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	req := oauth.NewRefresh("https://www.inoreader.com/oauth2/token")
-	tres, err := req.Refresh(*clientID, *clientSec, string(refreshToken))
+	tres, err := req.Refresh(*clientID, *clientSec, r.RefreshToken)
 	if err != nil {
 		log.Fatal(err)
 	}

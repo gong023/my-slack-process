@@ -1,0 +1,44 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: inoreader
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: inoreader
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/bash"]
+            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(inoreader -refresh_res $(gsutil cat gs://$(BUCKET)/ino) -client_id $(CLI_ID) -client_sec $(CLI_SEC) -tags $(TAG) 2>&1)"]
+            env:
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: ino-webhook
+              - name: BUCKET
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: oauth-bucket
+              - name: CLI_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: ino-cli-id
+              - name: CLI_SEC
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: ino-cli-sec
+              - name: TAG
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: ino-tags
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 3
