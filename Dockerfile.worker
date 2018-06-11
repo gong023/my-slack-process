@@ -14,4 +14,3 @@ COPY --from=builder /usr/local/bin/coinbase /usr/local/bin/coinbase
 COPY --from=builder /usr/local/bin/hibiki /usr/local/bin/hibiki
 COPY --from=builder /usr/local/bin/inoreader /usr/local/bin/inoreader
 COPY --from=builder /usr/local/bin/pixiv /usr/local/bin/pixiv
-COPY --from=builder /usr/local/bin/gs /usr/local/bin/gs

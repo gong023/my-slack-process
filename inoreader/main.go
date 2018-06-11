@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 
+	"context"
+	"github.com/gong023/my-slack-process/gs"
 	"github.com/gong023/my-slack-process/oauth"
 	"github.com/gong023/my-slack-process/slack"
 	"os"
@@ -49,12 +50,11 @@ type (
 )
 
 func main() {
-	refreshRes := flag.String("refresh_res", "", "refresh token response")
-	flag.Parse()
+	refreshBucket := os.Getenv("BUCKET")
 	clientID := os.Getenv("CLI_ID")
 	clientSec := os.Getenv("CLI_SEC")
 	tags := os.Getenv("TAG")
-	if *refreshRes == "" {
+	if refreshBucket == "" {
 		log.Fatal("missing parameter:refresh")
 	}
 	if clientID == "" {
@@ -67,8 +67,13 @@ func main() {
 		log.Fatal("missing parameter:tags")
 	}
 
+	ctx := context.Background()
+	refreshRes, err := gs.Cat(ctx, refreshBucket, "ino")
+	if err != nil {
+		log.Fatal(err)
+	}
 	var r oauth.TokenRes
-	err := json.Unmarshal([]byte(*refreshRes), &r)
+	err = json.Unmarshal(refreshRes, &r)
 	if err != nil {
 		log.Fatal(err)
 	}

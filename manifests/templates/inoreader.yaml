@@ -16,7 +16,7 @@ spec:
           - name: inoreader
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
             command: ["/bin/bash"]
-            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(inoreader -refresh_res `gs -bucket $(BUCKET) -object ino`)"]
+            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(inoreader 2>&1)"]
             volumeMounts:
             - name: google-cloud-key
               mountPath: /var/secrets/google
