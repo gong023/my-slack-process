@@ -8,12 +8,21 @@ spec:
     spec:
       template:
         spec:
+          volumes:
+          - name: google-cloud-key
+            secret:
+              secretName: storage-key
           containers:
           - name: inoreader
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
             command: ["/bin/bash"]
-            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(inoreader -refresh_res $(gsutil cat gs://$(BUCKET)/ino) -client_id $(CLI_ID) -client_sec $(CLI_SEC) -tags $(TAG) 2>&1)"]
+            args: ["-c", "stdpostb -webhook $(WEBHOOK) -messages <(inoreader -refresh_res $(gs -bucket $(BUCKET) -object ino) -client_id $(CLI_ID) -client_sec $(CLI_SEC) -tags $(TAG) 2>&1)"]
+            volumeMounts:
+            - name: google-cloud-key
+              mountPath: /var/secrets/google
             env:
+              - name: GOOGLE_APPLICATION_CREDENTIALS
+                value: /var/secrets/google/key.json
               - name: WEBHOOK
                 valueFrom:
                   secretKeyRef:
