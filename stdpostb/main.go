@@ -18,8 +18,11 @@ func main() {
 	msgs := flag.String("messages", "", "messages")
 	webhook := flag.String("webhook", "", "slack incoming webhook url")
 	flag.Parse()
-	if *msgs == "" || *webhook == "" {
-		log.Fatal("missing parameter")
+	if *msgs == "" {
+		log.Fatal("missing parameter:message")
+	}
+	if *webhook == "" {
+		log.Fatal("missing parameter:webhook")
 	}
 
 	f, err := os.Open(*msgs)

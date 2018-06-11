@@ -13,6 +13,7 @@ import (
 
 	"github.com/gong023/my-slack-process/oauth"
 	"github.com/gong023/my-slack-process/slack"
+	"os"
 )
 
 type (
@@ -49,27 +50,36 @@ type (
 
 func main() {
 	refreshRes := flag.String("refresh_res", "", "refresh token response")
-	clientID := flag.String("client_id", "", "inoreader client id")
-	clientSec := flag.String("client_sec", "", "inoreader client secret")
-	tags := flag.String("tags", "", "target innoreader tags. separate by comma(,)")
 	flag.Parse()
-	if *refreshRes == "" || *clientID == "" || *clientSec == "" || *tags == "" {
-		log.Fatal("missing parameter")
+	clientID := os.Getenv("CLI_ID")
+	clientSec := os.Getenv("CLI_SEC")
+	tags := os.Getenv("TAG")
+	if *refreshRes == "" {
+		log.Fatal("missing parameter:refresh")
+	}
+	if clientID == "" {
+		log.Fatal("missing parameter:clientID")
+	}
+	if clientSec == "" {
+		log.Fatal("missing parameter:clientSec")
+	}
+	if tags == "" {
+		log.Fatal("missing parameter:tags")
 	}
 
 	var r oauth.TokenRes
-	err := json.Unmarshal([]byte(*refreshRes), r)
+	err := json.Unmarshal([]byte(*refreshRes), &r)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	req := oauth.NewRefresh("https://www.inoreader.com/oauth2/token")
-	tres, err := req.Refresh(*clientID, *clientSec, r.RefreshToken)
+	tres, err := req.Refresh(clientID, clientSec, r.RefreshToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, tag := range strings.Split(*tags, ",") {
+	for _, tag := range strings.Split(tags, ",") {
 		streamRes := getStream(tres.AccessToken, tag)
 		readQuery := url.Values{}
 		readQuery.Add("a", "user/-/state/com.google/read")
