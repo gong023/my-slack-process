@@ -13,6 +13,7 @@ import (
 func main() {
 	email := os.Getenv("EMAIL")
 	password := os.Getenv("PASS")
+	driveCredentialPath := os.Getenv("DRIVE_CREDENTIAL_PATH")
 
 	s := flag.Duration("since", 5*time.Hour, "get since")
 	localSave := flag.String("local", os.TempDir(), "path to save tmp file in local")
@@ -67,10 +68,10 @@ func main() {
 			}
 
 			var veg errgroup.Group
-			for fileName, playCheck := range localFiles {
-				fileName, playCheck := fileName, playCheck
+			for filePath, playCheck := range localFiles {
+				filePath, playCheck := filePath, playCheck
 				veg.Go(func() error {
-					return ffmpeg(playCheck.PlaylistURL, fileName)
+					return runBackUp(playCheck.PlaylistURL, filePath, driveCredentialPath)
 				})
 			}
 
@@ -81,6 +82,27 @@ func main() {
 	if err := eg.Wait(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func runBackUp(m3u8URL, localPath, credentialPath string) error {
+	return nil
+	//err := ffmpeg(m3u8URL, localPath)
+	//if err != nil {
+	//	return err
+	//}
+	//ctx := context.Background()
+	//drive, err := googledrive.CreateFromSvcCredential(ctx, credentialPath)
+	//if err != nil {
+	//	return err
+	//}
+	//b, err := ioutil.ReadFile(localPath)
+	//if err != nil {
+	//	return err
+	//}
+	//p := strings.Split(localPath, "/")
+	//fileName := p[len(p)-1]
+	//
+	//return drive.Upload("hibiki", fileName, b)
 }
 
 func ffmpeg(m3u8URL, saveFile string) (err error) {
