@@ -104,10 +104,6 @@ func callback(w http.ResponseWriter, r *http.Request, vals url.Values, tokenURL,
 		return
 	}
 	bucket := client.Bucket(c.OauthBucket)
-	if err := bucket.Create(ctx, c.ProjectID, nil); err != nil {
-		fmt.Fprintf(w, err.Error())
-		return
-	}
 	ow := bucket.Object(field).NewWriter(ctx)
 	defer ow.Close()
 	if _, err := ow.Write(b); err != nil {
