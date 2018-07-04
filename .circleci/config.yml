@@ -46,6 +46,7 @@ jobs:
       - run:
           name: helm
           command: |
+            helm init --upgrade
             helm upgrade \
               --install \
               --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_WORKFLOW_ID},Host=${HOST} \
