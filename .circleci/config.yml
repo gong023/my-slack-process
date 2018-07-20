@@ -38,7 +38,7 @@ jobs:
               --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_WORKFLOW_ID} .
   deploy:
     docker:
-      - image: devth/helm
+      - image: devth/helm:latest
     steps:
       - checkout
       - run:
@@ -46,7 +46,6 @@ jobs:
       - run:
           name: helm
           command: |
-            helm init --upgrade
             helm upgrade \
               --install \
               --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_WORKFLOW_ID},Host=${HOST} \
