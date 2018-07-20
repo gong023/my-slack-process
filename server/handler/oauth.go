@@ -83,6 +83,8 @@ func start(w http.ResponseWriter, r *http.Request, url string) {
 
 func callback(w http.ResponseWriter, r *http.Request, vals url.Values, tokenURL, field string) {
 	vals.Add("code", r.URL.Query().Get("code"))
+	fmt.Fprintf(w, vals.Encode())
+	fmt.Fprintf(w, tokenURL)
 	res, err := http.PostForm(tokenURL, vals)
 	if err != nil {
 		fmt.Fprintf(w, err.Error())

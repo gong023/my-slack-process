@@ -11,10 +11,11 @@ import (
 	"strings"
 
 	"context"
+	"os"
+
 	"github.com/gong023/my-slack-process/gs"
 	"github.com/gong023/my-slack-process/oauth"
 	"github.com/gong023/my-slack-process/slack"
-	"os"
 )
 
 type (
@@ -76,6 +77,9 @@ func main() {
 	err = json.Unmarshal(refreshRes, &r)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if r.RefreshToken == "" {
+		log.Fatalf("invalid %s", string(refreshRes))
 	}
 
 	req := oauth.NewRefresh("https://www.inoreader.com/oauth2/token")
