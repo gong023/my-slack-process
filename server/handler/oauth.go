@@ -53,7 +53,7 @@ func InoCallback(w http.ResponseWriter, r *http.Request) {
 	v := url.Values{}
 	v.Add("client_id", c.InoCliID)
 	v.Add("client_secret", c.InoCliSec)
-	v.Add("redirect_uri", c.Host+"/oauth/inoreader/callback")
+	v.Add("redirect_uri", url.QueryEscape(c.Host+"/oauth/inoreader/callback"))
 	v.Add("grant_type", "authorization_code")
 	u := "https://www.inoreader.com/oauth2/token"
 
