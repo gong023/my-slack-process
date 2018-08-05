@@ -1,0 +1,49 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: pixiv
+spec:
+  schedule: "*/20 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: coinbase
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/bash"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(pixiv 2>&1)"]
+            env:
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: hakenyuri-webhook
+              - name: CLI_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: pixiv-client-id
+              - name: DEVICE_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: pixiv-device
+              - name: CLI_SEC
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: pixiv-client-sec
+              - name: REF_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: pixiv-refresh
+              - name: PROXY_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: pixiv-p-host
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 3

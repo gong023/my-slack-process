@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,6 +12,8 @@ import (
 	"time"
 
 	"github.com/gong023/my-slack-process/slack"
+	"os"
+	"strconv"
 )
 
 type (
@@ -60,18 +61,36 @@ type (
 )
 
 func main() {
-	client_id := flag.String("client_id", "", "client id")
-	device_token := flag.String("device_token", "", "device_token")
-	client_sec := flag.String("client_sec", "", "client secret")
-	refresh_token := flag.String("refresh_token", "", "refresh token")
-	host := flag.String("host", "", "redirect host")
-	s := flag.Int64("since", 20, "following illust since X min")
-	flag.Parse()
-	if *client_id == "" || *device_token == "" || *client_sec == "" || *refresh_token == "" || *host == "" {
-		log.Fatal("missing parameter")
+	clientID := os.Getenv("CLI_ID")
+	deviceToken := os.Getenv("DEVICE_TOKEN")
+	clientSec := os.Getenv("CLI_SEC")
+	refreshToken := os.Getenv("REF_TOKEN")
+	host := os.Getenv("PROXY_HOST")
+	if clientID == "" {
+		log.Fatal("CLI_ID is not given")
+	}
+	if deviceToken == "" {
+		log.Fatal("DEVICE_TOKEN is not given")
+	}
+	if clientSec == "" {
+		log.Fatal("CLI_SEC is not given")
+	}
+	if refreshToken == "" {
+		log.Fatal("REF_TOKEN is not given")
+	}
+	if host == "" {
+		log.Fatal("PROXY_HOST is not given")
 	}
 
-	token, err := getToken(*client_id, *client_sec, *device_token, *refresh_token)
+	s, err := strconv.Atoi(os.Getenv("SINCE"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if s == 0 {
+		s = 20
+	}
+
+	token, err := getToken(clientID, clientSec, deviceToken, refreshToken)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +100,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	since := time.Now().Add(-1 * time.Duration(*s) * time.Minute)
+	since := time.Now().Add(-1 * time.Duration(s) * time.Minute)
 	for _, illust := range illusts.Illusts {
 		create, err := time.Parse(time.RFC3339, illust.CreateDate)
 		if err != nil {
@@ -101,12 +120,12 @@ func main() {
 		}
 		if len(illust.MetaPages) <= 0 {
 			attachments.Attachments = append(attachments.Attachments, slack.Attachment{
-				ImageURL: *host + "?" + imagePath(illust.ImageURLs.Medium),
+				ImageURL: host + "?" + imagePath(illust.ImageURLs.Medium),
 			})
 		} else {
 			for _, metaPage := range illust.MetaPages {
 				attachments.Attachments = append(attachments.Attachments, slack.Attachment{
-					ImageURL: *host + "?" + imagePath(metaPage.Medium),
+					ImageURL: host + "?" + imagePath(metaPage.Medium),
 				})
 			}
 		}
