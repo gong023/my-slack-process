@@ -82,12 +82,13 @@ func main() {
 		log.Fatal("PROXY_HOST is not given")
 	}
 
-	s, err := strconv.Atoi(os.Getenv("SINCE"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	if s == 0 {
-		s = 20
+	s := 20
+	if os.Getenv("SINCE") != "" {
+		is, err := strconv.Atoi(os.Getenv("SINCE"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		s = is
 	}
 
 	token, err := getToken(clientID, clientSec, deviceToken, refreshToken)
