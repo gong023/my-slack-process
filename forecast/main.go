@@ -23,8 +23,8 @@ type (
 	}
 
 	Main struct {
-		TempMin int `json:"temp_min"`
-		TempMax int `json:"temp_max"`
+		TempMin float64 `json:"temp_min"`
+		TempMax float64 `json:"temp_max"`
 	}
 )
 
@@ -56,8 +56,8 @@ func main() {
 	}
 
 	desc := wres.Weather[0].Description
-	min := strconv.Itoa(wres.Main.TempMin)
-	max := strconv.Itoa(wres.Main.TempMax)
+	min := strconv.FormatFloat(wres.Main.TempMin, 'E', -1, 64)
+	max := strconv.FormatFloat(wres.Main.TempMax, 'E', -1, 64)
 	m := "(" + *city + ") " + desc + " " + min + "C/" + max + "C"
 
 	fmt.Print(m)
