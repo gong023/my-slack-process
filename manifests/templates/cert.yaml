@@ -7,13 +7,13 @@ spec:
   secretName: cert-manager-tls
   issuerRef:
     name: cert-issuer-prod
-  commonName: {{ .Values.Host }}
+  commonName: {{ .Values.DnsName }}
   dnsNames:
-  - www.{{ .Values.Host }}
+  - {{ .Values.DnsName }}
   acme:
     config:
     - dns01:
         provider: cert-dns
       domains:
-      - {{ .Values.Host }}
-      - www.{{ .Values.Host }}
+      - {{ .Values.DnsName }}
+      - www.{{ .Values.DnsName }}

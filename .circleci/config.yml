@@ -38,7 +38,7 @@ jobs:
               --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_WORKFLOW_ID} .
   deploy:
     docker:
-      - image: devth/helm:v2.10.0-rc.1
+      - image: devth/helm:v2.10.0
     steps:
       - checkout
       - run:
@@ -48,7 +48,7 @@ jobs:
           command: |
             helm upgrade \
               --install \
-              --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_WORKFLOW_ID},Host=${HOST} \
+              --set ProjectId=${GOOGLE_PROJECT_ID},BuildNum=${CIRCLE_WORKFLOW_ID},Host=${HOST},DnsName=${DNS_NAME} \
               cron ./manifests/
 
 workflows:
