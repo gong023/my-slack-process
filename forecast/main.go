@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type (
@@ -30,7 +29,7 @@ type (
 
 func main() {
 	wtoken := flag.String("wtoken", "", "token for https://openweathermap.org/api")
-	city := flag.String("city", "San Francisco", "city to get forecast")
+	city := flag.String("city", "Palo Alto", "city to get forecast")
 	flag.Parse()
 	if *wtoken == "" {
 		log.Fatal("wtoken is required")
@@ -56,9 +55,5 @@ func main() {
 	}
 
 	desc := wres.Weather[0].Description
-	min := strconv.FormatFloat(wres.Main.TempMin, 'E', -1, 64)
-	max := strconv.FormatFloat(wres.Main.TempMax, 'E', -1, 64)
-	m := "(" + *city + ") " + desc + " " + min + "C/" + max + "C"
-
-	fmt.Print(m)
+	fmt.Printf("(%s) %s %fC/%fC", *city, desc, wres.Main.TempMin, wres.Main.TempMax)
 }
