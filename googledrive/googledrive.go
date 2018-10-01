@@ -11,7 +11,7 @@ import (
 )
 
 func Create(localPath, driveFolder string) (link string, err error) {
-	b, err := ioutil.ReadFile("/etc/serviceaccount.json")
+	b, err := ioutil.ReadFile("/etc/drivesrvaccount.json")
 	if err != nil {
 		return
 	}

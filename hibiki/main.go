@@ -78,7 +78,7 @@ func main() {
 						return err
 					}
 					_, f := filepath.Split(filePath)
-					fmt.Sprintf("%s %s", f, link)
+					fmt.Printf("%s %s\n", f, link)
 					return nil
 				})
 			}
@@ -93,14 +93,21 @@ func main() {
 }
 
 func runBackUp(m3u8URL, savePath, driveDirID string) (string, error) {
-	err := ffmpeg(m3u8URL, savePath)
-	if err != nil {
+	if err := ffmpegStream(m3u8URL, savePath); err != nil {
 		return "", err
 	}
-	return googledrive.Create(savePath, driveDirID)
+	if err := ffmpegToMP3(savePath); err != nil {
+		return "", err
+	}
+	return googledrive.Create(savePath+".mp3", driveDirID)
 }
 
-func ffmpeg(m3u8URL, saveFile string) (err error) {
+func ffmpegStream(m3u8URL, saveFile string) (err error) {
 	args := []string{"-y", "-vn", "-i", m3u8URL, "-acodec", "copy", "-bsf:a", "aac_adtstoasc", saveFile}
+	return exec.Command("ffmpeg", args...).Run()
+}
+
+func ffmpegToMP3(filePath string) error {
+	args := []string{"-y", "-i", filePath, "-acodec", "libmp3lame", "-ac", "2", "-ab", "160", filePath + ".mp3"}
 	return exec.Command("ffmpeg", args...).Run()
 }
