@@ -1,0 +1,46 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: hibiki
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: srv-account-key
+            secret:
+              secretName: drive-key
+          containers:
+          - name: hibiki
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/bash"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(hibiki 2>&1)"]
+            volumeMounts:
+            - name: srv-account-key
+              mountPath: /etc/drivesrvaccount.json
+            env:
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: general-webhook
+              - name: EMAIL
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: hibiki-mail
+              - name: PASS
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: hibiki-pass
+              - name: DRIVE_DIR_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: radio-drive
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 3
