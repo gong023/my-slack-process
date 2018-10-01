@@ -1,39 +1,45 @@
 package googledrive
 
 import (
-	"bytes"
-	"context"
+	"fmt"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"io/ioutil"
-	"net/http"
+	"os"
+	"path/filepath"
 )
 
-type Client struct {
-	cli *http.Client
-}
-
-func CreateFromSvcCredential(ctx context.Context, path string) (cli *Client, err error) {
-	b, err := ioutil.ReadFile(path)
+func Create(localPath, driveFolder string) (link string, err error) {
+	b, err := ioutil.ReadFile("/etc/serviceaccount.json")
 	if err != nil {
 		return
 	}
+
 	config, err := google.JWTConfigFromJSON(b, drive.DriveScope)
 	if err != nil {
 		return
 	}
+	client := config.Client(oauth2.NoContext)
 
-	return &Client{cli: config.Client(ctx)}, nil
-}
-
-func (c *Client) Upload(name string, data []byte) error {
-	svc, err := drive.New(c.cli)
+	srv, err := drive.New(client)
 	if err != nil {
-		return err
+		return
 	}
-	f := &drive.File{Name: name}
-	b := bytes.NewBuffer(data)
-	svc.Files.GenerateIds()
-	_, err = svc.Files.Create(f).Media(b).Fields("test").Do()
-	return err
+
+	f, err := os.Open(localPath)
+	if err != nil {
+		return
+	}
+	_, fn := filepath.Split(f.Name())
+
+	df := &drive.File{
+		Parents: []string{driveFolder},
+		Name:    fn,
+	}
+	ff, err := srv.Files.Create(df).Media(f).Do()
+	if err != nil {
+		return
+	}
+	return fmt.Sprintf("https://drive.google.com/file/d/%s/view", ff.Id), nil
 }

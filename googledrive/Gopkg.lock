@@ -2,50 +2,61 @@
 
 
 [[projects]]
+  digest = "1:f8ad8a53fa865a70efbe215b0ca34735523f50ea39e0efde319ab6fc80089b44"
   name = "cloud.google.com/go"
   packages = ["compute/metadata"]
+  pruneopts = "UT"
   revision = "0fd7230b2a7505833d5f69b75cbd6c9582401479"
   version = "v0.23.0"
 
 [[projects]]
+  digest = "1:15042ad3498153684d09f393bbaec6b216c8eec6d61f63dff711de7d64ed8861"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "UT"
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:ce1f391e0e8c5e3c635dc2c712b037a2d0fd4241cc5648f23ca071565dd385f2"
   name = "golang.org/x/net"
   packages = [
     "context",
-    "context/ctxhttp"
+    "context/ctxhttp",
   ]
+  pruneopts = "UT"
   revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   branch = "master"
+  digest = "1:3e5c2c371f479ba54bb6864e7ba202609fe99076480b430d8046591d409c7b01"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "google",
     "internal",
     "jws",
-    "jwt"
+    "jwt",
   ]
+  pruneopts = "UT"
   revision = "1e0a3fa8ba9a5c9eb35c271780101fdaf1b205d7"
 
 [[projects]]
   branch = "master"
+  digest = "1:8089905b4c91ce79e461130f2d2f8a9d9e98c4dde679f38c312e4ef7041172fb"
   name = "google.golang.org/api"
   packages = [
     "drive/v3",
     "gensupport",
     "googleapi",
-    "googleapi/internal/uritemplates"
+    "googleapi/internal/uritemplates",
   ]
+  pruneopts = "UT"
   revision = "2eea9ba0a3d94f6ab46508083e299a00bbbc65f6"
 
 [[projects]]
+  digest = "1:10eab6a94bbd813a6f162c1a89676b62b2d6c214190d1529ae2ebbde3c9e24b9"
   name = "google.golang.org/appengine"
   packages = [
     ".",
@@ -57,14 +68,15 @@
     "internal/modules",
     "internal/remote_api",
     "internal/urlfetch",
-    "urlfetch"
+    "urlfetch",
   ]
+  pruneopts = "UT"
   revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
   version = "v1.1.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c967df4bc846a1bec73a29d084e7c91a1342c2b34bc07d34e7b84ac3c879dcc8"
+  input-imports = []
   solver-name = "gps-cdcl"
   solver-version = 1
