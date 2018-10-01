@@ -19,7 +19,7 @@ spec:
             args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(hibiki 2>&1)"]
             volumeMounts:
             - name: srv-account-key
-              mountPath: /etc/drivesrvaccount.json
+              mountPath: /etc
             env:
               - name: WEBHOOK
                 valueFrom:
