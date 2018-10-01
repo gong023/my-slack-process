@@ -3,17 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gong023/my-slack-process/googledrive"
 	"golang.org/x/sync/errgroup"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
 func main() {
 	email := os.Getenv("EMAIL")
 	password := os.Getenv("PASS")
-	driveCredentialPath := os.Getenv("DRIVE_CREDENTIAL_PATH")
+	driveDirID := os.Getenv("DRIVE_DIR_ID")
 
 	s := flag.Duration("since", 5*time.Hour, "get since")
 	localSave := flag.String("local", os.TempDir(), "path to save tmp file in local")
@@ -71,7 +73,13 @@ func main() {
 			for filePath, playCheck := range localFiles {
 				filePath, playCheck := filePath, playCheck
 				veg.Go(func() error {
-					return runBackUp(playCheck.PlaylistURL, filePath, driveCredentialPath)
+					link, err := runBackUp(playCheck.PlaylistURL, filePath, driveDirID)
+					if err != nil {
+						return err
+					}
+					_, f := filepath.Split(filePath)
+					fmt.Sprintf("%s %s", f, link)
+					return nil
 				})
 			}
 
@@ -84,25 +92,12 @@ func main() {
 	}
 }
 
-func runBackUp(m3u8URL, localPath, credentialPath string) error {
-	return nil
-	//err := ffmpeg(m3u8URL, localPath)
-	//if err != nil {
-	//	return err
-	//}
-	//ctx := context.Background()
-	//drive, err := googledrive.CreateFromSvcCredential(ctx, credentialPath)
-	//if err != nil {
-	//	return err
-	//}
-	//b, err := ioutil.ReadFile(localPath)
-	//if err != nil {
-	//	return err
-	//}
-	//p := strings.Split(localPath, "/")
-	//fileName := p[len(p)-1]
-	//
-	//return drive.Upload("hibiki", fileName, b)
+func runBackUp(m3u8URL, savePath, driveDirID string) (string, error) {
+	err := ffmpeg(m3u8URL, savePath)
+	if err != nil {
+		return "", err
+	}
+	return googledrive.Create(savePath, driveDirID)
 }
 
 func ffmpeg(m3u8URL, saveFile string) (err error) {

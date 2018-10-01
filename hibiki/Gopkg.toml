@@ -25,9 +25,7 @@
 #   unused-packages = true
 
 
-[[constraint]]
-  branch = "master"
-  name = "github.com/gong023/my-slack-process"
+ignored = ["github.com/gong023/my-slack-process/googledrive"]
 
 [[constraint]]
   branch = "master"
