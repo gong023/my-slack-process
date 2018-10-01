@@ -55,5 +55,5 @@ func main() {
 	}
 
 	desc := wres.Weather[0].Description
-	fmt.Printf("(%s) %s %fC/%fC", *city, desc, wres.Main.TempMin, wres.Main.TempMax)
+	fmt.Printf("(%s) %s %.1fC/%.1fC", *city, desc, wres.Main.TempMin, wres.Main.TempMax)
 }
