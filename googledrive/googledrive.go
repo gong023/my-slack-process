@@ -2,16 +2,17 @@ package googledrive
 
 import (
 	"fmt"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
 )
 
 func Create(localPath, driveFolder string) (link string, err error) {
-	b, err := ioutil.ReadFile("/etc/drivesrvaccount.json")
+	b, err := ioutil.ReadFile("/var/secrets/drivesrvaccount.json")
 	if err != nil {
 		return
 	}
