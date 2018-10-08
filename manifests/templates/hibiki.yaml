@@ -16,7 +16,7 @@ spec:
           - name: hibiki
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
             command: ["/bin/bash"]
-            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(hibiki 2>&1)"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(hibiki -since 1h 2>&1)"]
             volumeMounts:
             - name: srv-account-key
               mountPath: /var/secrets
