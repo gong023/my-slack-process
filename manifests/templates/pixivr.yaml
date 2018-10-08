@@ -1,18 +1,18 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: pixivf
+  name: pixivr
 spec:
-  schedule: "*/20 * * * *"
+  schedule: "30 3 * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: coinbase
+          - name: base
             image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
             command: ["/bin/bash"]
-            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(pixivf 2>&1)"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(pixivr 2>&1)"]
             env:
               - name: WEBHOOK
                 valueFrom:
