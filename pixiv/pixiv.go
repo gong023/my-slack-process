@@ -31,7 +31,12 @@ type (
 		Illusts []Illust `json:"illusts"`
 	}
 
+	RankingIllusts struct {
+		Illusts []Illust `json:"illusts"`
+	}
+
 	Illust struct {
+		ID         int `json:"id"`
 		Title      string
 		Caption    string
 		CreateDate string `json:"create_date"`
@@ -135,7 +140,41 @@ func GetFollowingIllusts(token TokenData) (illusts FollowingIllusts, err error) 
 		return
 	}
 	if res.StatusCode >= 300 {
-		return illusts, errors.New(fmt.Sprintf("following error [%s]:(%s)", res.Status, string(b)))
+		return illusts, fmt.Errorf("following error [%s]:(%s)", res.Status, string(b))
+	}
+
+	err = json.Unmarshal(b, &illusts)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func GetDailyRankingIllusts(token TokenData) (illusts RankingIllusts, err error) {
+	q := url.Values{}
+	q.Add("mode", "day_manga") // or week_manga, month_manga
+	q.Add("filter", "for_ios")
+	u := "https://app-api.pixiv.net/v1/illust/ranking?" + q.Encode()
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", u, nil)
+	commonHeader(req.Header)
+	req.Header.Add("Authorization", "Bearer "+token.AccessToken)
+	if err != nil {
+		return
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return
+	}
+	if res.StatusCode >= 300 {
+		return illusts, fmt.Errorf("following error [%s]:(%s)", res.Status, string(b))
 	}
 
 	err = json.Unmarshal(b, &illusts)

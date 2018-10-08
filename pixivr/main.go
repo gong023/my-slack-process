@@ -1,14 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/gong023/my-slack-process/pixiv"
-	"github.com/gong023/my-slack-process/slack"
 	"log"
+	"github.com/gong023/my-slack-process/slack"
+	"fmt"
+	"encoding/json"
 	"os"
-	"time"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 		log.Fatal("PROXY_HOST is not given")
 	}
 
-	s := flag.Duration("since", 20*time.Minute, "get since")
+	limit := flag.Int("limit", 5, "rankings up to x")
 	flag.Parse()
 
 	token, err := pixiv.GetToken()
@@ -25,19 +24,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	illusts, err := pixiv.GetFollowingIllusts(token)
+	illusts, err := pixiv.GetDailyRankingIllusts(token)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	since := time.Now().Add(*(s) * -1)
-	for _, illust := range illusts.Illusts {
-		create, err := time.Parse(time.RFC3339, illust.CreateDate)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if create.Before(since) {
-			continue
+	for i, illust := range illusts.Illusts {
+		if i > *limit {
+			break
 		}
 
 		attachments := slack.Attachments{
