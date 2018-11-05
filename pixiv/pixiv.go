@@ -62,6 +62,10 @@ type (
 	}
 )
 
+var cli = &http.Client{
+	Timeout: time.Minute,
+}
+
 func GetToken() (token TokenData, err error) {
 	clientID := os.Getenv("CLI_ID")
 	deviceToken := os.Getenv("DEVICE_TOKEN")
@@ -88,7 +92,6 @@ func GetToken() (token TokenData, err error) {
 	data.Add("grant_type", "refresh_token")
 	data.Add("get_secure_url", "true")
 	body := bytes.NewReader([]byte(data.Encode()))
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", "https://oauth.secure.pixiv.net/auth/token", body)
 	commonHeader(req.Header)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -96,7 +99,7 @@ func GetToken() (token TokenData, err error) {
 		return
 	}
 
-	res, err := client.Do(req)
+	res, err := cli.Do(req)
 	if err != nil {
 		return
 	}
@@ -122,7 +125,6 @@ func GetFollowingIllusts(token TokenData) (illusts FollowingIllusts, err error) 
 	q := url.Values{}
 	q.Add("restrict", "all")
 	url := "https://app-api.pixiv.net/v2/illust/follow?" + q.Encode()
-	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	commonHeader(req.Header)
 	req.Header.Add("Authorization", "Bearer "+token.AccessToken)
@@ -130,7 +132,7 @@ func GetFollowingIllusts(token TokenData) (illusts FollowingIllusts, err error) 
 		return
 	}
 
-	res, err := client.Do(req)
+	res, err := cli.Do(req)
 	if err != nil {
 		return
 	}
@@ -156,7 +158,6 @@ func GetDailyRankingIllusts(token TokenData) (illusts RankingIllusts, err error)
 	q.Add("mode", "day_manga") // or week_manga, month_manga
 	q.Add("filter", "for_ios")
 	u := "https://app-api.pixiv.net/v1/illust/ranking?" + q.Encode()
-	client := &http.Client{}
 	req, err := http.NewRequest("GET", u, nil)
 	commonHeader(req.Header)
 	req.Header.Add("Authorization", "Bearer "+token.AccessToken)
@@ -164,7 +165,7 @@ func GetDailyRankingIllusts(token TokenData) (illusts RankingIllusts, err error)
 		return
 	}
 
-	res, err := client.Do(req)
+	res, err := cli.Do(req)
 	if err != nil {
 		return
 	}
