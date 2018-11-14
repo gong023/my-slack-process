@@ -63,7 +63,7 @@ type (
 )
 
 var cli = &http.Client{
-	Timeout: time.Minute,
+	Timeout: 10 * time.Minute,
 }
 
 func GetToken() (token TokenData, err error) {
