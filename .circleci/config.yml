@@ -20,7 +20,7 @@ jobs:
       - run:
           name: build and push
           command: |
-            gcloud container builds submit \
+            gcloud builds submit \
               --config=cloudbuild.worker.yaml \
               --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_WORKFLOW_ID} .
   build_server:
@@ -33,7 +33,7 @@ jobs:
       - run:
           name: build and push
           command: |
-            gcloud container builds submit \
+            gcloud builds submit \
               --config=cloudbuild.server.yaml \
               --substitutions=_PROJECT_ID=${GOOGLE_PROJECT_ID},_BUILD_NUM=${CIRCLE_WORKFLOW_ID} .
   deploy:
