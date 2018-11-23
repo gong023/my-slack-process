@@ -1,0 +1,44 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: twitterf
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: twitter
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/bash"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(twitterf 2>&1)"]
+            env:
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: twitter-webhook
+              - name: TWITTER_ACCESS
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: twitter-access
+              - name: TWITTER_ASEC
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: twitter-asec
+              - name: TWITTER_CKEY
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: twitter-ckey
+              - name: TWITTER_CSEC
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: twitter-csec
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 2
