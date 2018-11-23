@@ -25,7 +25,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: slacksec
-                    key: general-webhook
+                    key: radio-webhook
               - name: EMAIL
                 valueFrom:
                   secretKeyRef:
