@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: twitterf
 spec:
-  schedule: "*/15 * * * *"
+  schedule: "10 * * * *"
   jobTemplate:
     spec:
       template:
