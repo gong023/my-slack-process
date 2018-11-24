@@ -1,44 +1,46 @@
-apiVersion: batch/v1beta1
-kind: CronJob
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
   name: twitterf
 spec:
-  schedule: "10 * * * *"
-  jobTemplate:
+  selector:
+    matchLabels:
+      name: twitterf-worker
+  template:
+    metadata:
+      labels:
+        name: twitterf-worker
     spec:
-      template:
-        spec:
-          containers:
-          - name: twitter
-            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
-            command: ["/bin/bash"]
-            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(twitterf 2>&1)"]
-            env:
-              - name: WEBHOOK
-                valueFrom:
-                  secretKeyRef:
-                    name: slacksec
-                    key: twitter-webhook
-              - name: TWITTER_ACCESS
-                valueFrom:
-                  secretKeyRef:
-                    name: slacksec
-                    key: twitter-access
-              - name: TWITTER_ASEC
-                valueFrom:
-                  secretKeyRef:
-                    name: slacksec
-                    key: twitter-asec
-              - name: TWITTER_CKEY
-                valueFrom:
-                  secretKeyRef:
-                    name: slacksec
-                    key: twitter-ckey
-              - name: TWITTER_CSEC
-                valueFrom:
-                  secretKeyRef:
-                    name: slacksec
-                    key: twitter-csec
-          restartPolicy: Never
-          successfulJobsHistoryLimit: 0
-          failedJobsHistoryLimit: 2
+      nodeSelector:
+        kubernetes.io/hostname: gke-test-cluster-default-pool-d2e6f5a4-5nkn
+      containers:
+      - name: twitter
+        image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+        command: ["/bin/bash"]
+        args: ["-c", "twitterf"]
+        env:
+          - name: WEBHOOK
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: twitter-webhook
+          - name: TWITTER_ACCESS
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: twitter-access
+          - name: TWITTER_ASEC
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: twitter-asec
+          - name: TWITTER_CKEY
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: twitter-ckey
+          - name: TWITTER_CSEC
+            valueFrom:
+              secretKeyRef:
+                name: slacksec
+                key: twitter-csec
