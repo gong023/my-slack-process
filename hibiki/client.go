@@ -107,12 +107,12 @@ func (s *Session) do(req *http.Request, res interface{}) error {
 	client := &http.Client{}
 	r, err := client.Do(req)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer r.Body.Close()
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return nil
+		return err
 	}
 	if r.StatusCode >= 300 {
 		return fmt.Errorf("%s error [%s]:(%s)", req.URL.Path, r.Status, string(b))
