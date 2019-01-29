@@ -6,13 +6,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/ChimeraCoder/anaconda"
-	"github.com/gong023/my-slack-process/slack"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/ChimeraCoder/anaconda"
+	"github.com/gong023/my-slack-process/slack"
 )
 
 var (
@@ -44,7 +45,7 @@ func main() {
 	cli = anaconda.NewTwitterApiWithCredentials(accessToken, accessSecret, consumerKey, consumerSecret)
 
 	mediaMin := flag.Int("media_min", 300, "")
-	mediaMax := flag.Int("media_max", 5000, "")
+	mediaMax := flag.Int("media_max", 3000, "")
 	tolerance := flag.Int("tolerance", 3, "for minor")
 	activeTweet := flag.Duration("active_tweet", -3*24*time.Hour, "")
 	interval := flag.Duration("interval", 15*time.Minute, "")
