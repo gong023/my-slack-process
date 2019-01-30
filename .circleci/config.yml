@@ -44,6 +44,10 @@ jobs:
       - run:
           <<: *gcloud_auth
       - run:
+          name: stop-job
+          command: |
+            kubectl delete job twitterf -n default
+      - run:
           name: helm
           command: |
             helm upgrade \
