@@ -16,7 +16,7 @@ func main() {
 		log.Fatal("PROXY_HOST is not given")
 	}
 
-	limit := flag.Int("limit", 5, "rankings up to x")
+	limit := flag.Int("limit", 3, "rankings up to x")
 	flag.Parse()
 
 	token, err := pixiv.GetToken()
