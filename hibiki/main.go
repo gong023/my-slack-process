@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gong023/my-slack-process/googledrive"
-	"golang.org/x/sync/errgroup"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/gong023/my-slack-process/googledrive"
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -43,6 +44,9 @@ func main() {
 		fav := fav
 		eg.Go(func() error {
 			episode := fav.Program.Episode
+			if episode.UpdatedAt == "" {
+				return nil
+			}
 			updated, err := time.ParseInLocation("2006/01/02 15:04:05", episode.UpdatedAt, jloc)
 			if err != nil {
 				return err
