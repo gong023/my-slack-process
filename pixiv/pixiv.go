@@ -2,10 +2,12 @@ package pixiv
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -63,7 +65,15 @@ type (
 )
 
 var cli = &http.Client{
-	Timeout: 10 * time.Minute,
+	Timeout: 20 * time.Minute,
+	Transport: &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (conn net.Conn, e error) {
+			return net.DialTimeout(network, addr, 5*time.Minute)
+		},
+		TLSHandshakeTimeout:   3 * time.Minute,
+		ResponseHeaderTimeout: 10 * time.Minute,
+		ExpectContinueTimeout: 10 * time.Minute,
+	},
 }
 
 func GetToken() (token TokenData, err error) {
