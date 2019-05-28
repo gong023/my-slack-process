@@ -68,9 +68,9 @@ var cli = &http.Client{
 	Timeout: 20 * time.Minute,
 	Transport: &http.Transport{
 		DialContext: func(ctx context.Context, network, addr string) (conn net.Conn, e error) {
-			return net.DialTimeout(network, addr, 5*time.Minute)
+			return net.DialTimeout(network, addr, 15*time.Minute)
 		},
-		TLSHandshakeTimeout:   3 * time.Minute,
+		TLSHandshakeTimeout:   10 * time.Minute,
 		ResponseHeaderTimeout: 10 * time.Minute,
 		ExpectContinueTimeout: 10 * time.Minute,
 	},

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"flag"
-	"github.com/gong023/my-slack-process/pixiv"
-	"log"
-	"github.com/gong023/my-slack-process/slack"
-	"fmt"
 	"encoding/json"
+	"flag"
+	"fmt"
+	"log"
 	"os"
+
+	"github.com/gong023/my-slack-process/pixiv"
+	"github.com/gong023/my-slack-process/slack"
 )
 
 func main() {
