@@ -1,7 +1,8 @@
-FROM golang:1.11 as builder
+FROM golang:1.12 as builder
 
-ADD . /go/src/github.com/gong023/my-slack-process
+ADD . /opt/my-slack-process
 
+WORKDIR /opt/my-slack-process/server
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /usr/local/bin/server github.com/gong023/my-slack-process/server
 
 FROM alpine:3.7
