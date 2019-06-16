@@ -205,8 +205,8 @@ func ImagePath(origin string) string {
 
 func commonHeader(h http.Header) {
 	h.Add("Accept-Language", "ja-jp")
-	h.Add("App-Version", "7.2.1")
-	h.Add("User-Agent", "PixivIOSApp/7.2.1 (iOS 11.1; iPad4,4)")
-	h.Add("App-OS-Version", "11.4.1")
+	h.Add("App-Version", "7.6.2")
+	h.Add("App-Os-Version", "12.2")
+	h.Add("User-Agent", "PixivIOSApp/7.6.2 (iOS 12.2; iPad7,3)")
 	h.Add("X-Client-Time", time.Now().Format(time.RFC3339))
 }
