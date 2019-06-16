@@ -1,0 +1,51 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: onsen
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: srv-account-key
+            secret:
+              secretName: drive-key
+          containers:
+          - name: onsen
+            image: gcr.io/{{ .Values.ProjectId }}/slack-p:{{ .Values.BuildNum }}
+            command: ["/bin/bash"]
+            args: ["-c", "stdpostc -webhook $(WEBHOOK) -messages <(onsen -since 1h 2>&1)"]
+            volumeMounts:
+            - name: srv-account-key
+              mountPath: /var/secrets
+            env:
+              - name: WEBHOOK
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: radio-webhook
+              - name: TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: onsen-token
+              - name: DEVICE_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: onsen-device-id
+              - name: DEVICE_NAME
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: onsen-device-name
+              - name: DRIVE_DIR_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: slacksec
+                    key: radio-drive
+          restartPolicy: Never
+          successfulJobsHistoryLimit: 0
+          failedJobsHistoryLimit: 3
