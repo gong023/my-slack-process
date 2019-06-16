@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -67,19 +68,19 @@ type (
 const host = "https://app.onsen.ag"
 
 func main() {
-	token := os.Getenv("TOKEN")
+	token := strings.TrimSuffix(os.Getenv("TOKEN"), "\n")
 	if token == "" {
 		log.Fatal("token is not given")
 	}
-	deviceID := os.Getenv("DEVICE_ID")
+	deviceID := strings.TrimSuffix(os.Getenv("DEVICE_ID"), "\n")
 	if deviceID == "" {
 		log.Fatal("deviceID is not given")
 	}
-	deviceName := os.Getenv("DEVICE_NAME")
+	deviceName := strings.TrimSuffix(os.Getenv("DEVICE_NAME"), "\n")
 	if deviceName == "" {
 		log.Fatal("deviceName is not given")
 	}
-	driveDirID := os.Getenv("DRIVE_DIR_ID")
+	driveDirID := strings.TrimSuffix(os.Getenv("DRIVE_DIR_ID"), "\n")
 	if driveDirID == "" {
 		log.Fatal("driveDirID is not given")
 	}
