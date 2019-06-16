@@ -16,3 +16,4 @@ COPY --from=builder /usr/local/bin/inoreader /usr/local/bin/inoreader
 COPY --from=builder /usr/local/bin/pixivf /usr/local/bin/pixivf
 COPY --from=builder /usr/local/bin/pixivr /usr/local/bin/pixivr
 COPY --from=builder /usr/local/bin/twitterf /usr/local/bin/twitterf
+COPY --from=builder /usr/local/bin/onsen /usr/local/bin/onsen
