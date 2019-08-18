@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: server-static-ip
 spec:
   tls:
-  - secretName: cert-manager-tls
+  - secretName: ingress-tls
     hosts:
       - {{ .Values.Host }}
   backend:

@@ -4,7 +4,7 @@ metadata:
   name: cert-issuer-prod
 spec:
   acme:
-    server: https://acme-v01.api.letsencrypt.org/directory
+    server: https://acme-v02.api.letsencrypt.org/directory
     email: gon.gong.gone@gmail.com
     privateKeySecretRef:
       name: letsencrypt-prod
@@ -14,6 +14,6 @@ spec:
       - name: cert-dns
         clouddns:
           serviceAccountSecretRef:
-            name: clouddns-service-account
-            key: cert-manager-key.json
+            name: clouddns-dns01-solver-svc-acct
+            key: key.json
           project: {{ .Values.ProjectId }}
