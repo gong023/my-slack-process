@@ -29,7 +29,7 @@ type (
 
 func main() {
 	wtoken := flag.String("wtoken", "", "token for https://openweathermap.org/api")
-	city := flag.String("city", "Palo Alto", "city to get forecast")
+	city := flag.String("city", "Tokyo", "city to get forecast")
 	flag.Parse()
 	if *wtoken == "" {
 		log.Fatal("wtoken is required")
