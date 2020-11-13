@@ -3,7 +3,8 @@ kind: Ingress
 metadata:
   name: server-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: server-static-ip
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/issuer: cert-issuer-prod
 spec:
   tls:
   - secretName: ingress-tls
